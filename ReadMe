@@ -1,0 +1,47 @@
+1 AccountCRUDList
+https://ibmlightningcomponent-dev-ed.lightning.force.com/c/AccountCRUDList.app
+
+1.Create button 
+menu checkbox
+2.edit button
+3.delete button
+4.View button
+when you create the account you need to select the recourdtype firstly 
+
+when you refresh the page 
+showSpinnerCmp can be implement
+
+app
+AccountCRUDList 
+
+Component 
+
+1.AccountListview
+2.showSpinnerCmp
+3.AccountView 
+4.AccountEdit
+
+css
+slds-modal_
+
+Component
+tbody
+tr
+td 
+
+recordData
+1.View
+2.deleteRecord
+3.edit
+
+e.force:showToast
+e.force:refreshView
+
+Apex
+AccountListViewController
+
+Merit
+CDUT List 
+
+demerit
+paging not implement
