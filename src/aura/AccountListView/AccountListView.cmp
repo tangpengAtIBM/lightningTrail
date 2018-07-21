@@ -1,0 +1,165 @@
+<aura:component controller="AccountListViewController" access="global"  implements="flexipage:availableForAllPageTypes">
+        <aura:attribute name="recList" type="List" />
+        <aura:attribute name="menu"  type="List" default="View,Edit,Delete" description="Optional Menu Items"/>
+        <aura:attribute name="currentView" type="String" default="ListView"/>
+        <aura:attribute name="selectedRecord" type="String" />
+        
+        <aura:attribute name="isRefreshRequired" type="boolean" default="false" />
+        <aura:handler name="change" value="{!v.isRefreshRequired}" action="{!c.refreshListView}"/>
+        
+        <!--attributes for recordtype selection-->
+        <aura:attribute name="selectedRecordType" type="String"/>
+        <aura:attribute name="recordTypeList" type="Object[]"/>
+        <!--attributes for deleting record from list-->
+        <aura:attribute name="recordDeleteError" type="String" access="private"/>
+        <aura:attribute name="recordIdToDelete" type="String" access="private"/>
+        
+        
+        <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+        <!--<aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+        <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>-->
+        <aura:attribute name="showSpinner" type="Boolean" default="false" />
+        <c:showSpinnerCmp show="{!v.showSpinner}"/>
+        
+        
+        <div class="slds-align--absolute-center">
+            <lightning:button variant="brand" label="Create New"  onclick="{!c.createRecordhandler}"/> 
+        </div>
+
+        <!--Section for Account List View starts-->
+    <aura:if isTrue="{!v.currentView =='ListView'}">
+            <aura:if isTrue="{!v.recList.length > 0}">
+                <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+                    <thead>
+                        <tr class="slds-text-title--caps">
+                            <th scope="col">Actions</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Industry</th>
+                            <th scope="col">RecordType Name</th>
+                            
+                        </tr>
+                    </thead>
+                    <aura:iteration items="{!v.recList}" var="item">
+                        <tr>
+                            <td>
+                                <lightning:buttonMenu iconName="utility:threedots" >
+                                    <aura:iteration items="{!v.menu}"  var="menuItem">
+                                        <lightning:menuItem label="{!menuItem}" value="{!item.Id + '---' + menuItem}" onactive="{!c.onSelectMenuItem}"/>
+                                    </aura:iteration>
+                                </lightning:buttonMenu>
+                            </td>
+                            <td> {!item.Name}</td>
+                            <td> {!item.Type}</td>
+                            <td> {!item.Industry}</td>
+                            <td>{!item.RecordType.Name}</td>
+                        </tr>
+                    </aura:iteration>
+                </table>
+            </aura:if>
+        </aura:if>
+        <!--Section for Account List View ends-->
+        
+        <!--Section for Account recordType Selection starts-->
+        <aura:if isTrue="{!v.currentView =='RecordTypeSelection'}">
+            <div role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header">
+                        <lightning:buttonIcon class="slds-modal__close" iconName="utility:close" size="large" 
+                                              variant="bare-inverse" alternativeText="Close" onclick="{!c.defaultCloseAction}" /> 
+                        
+                        <h2 id="header43" class="slds-text-heading--medium">Please select record Type</h2>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <div class="slds-align--absolute-center">
+                            <aura:iteration items="{!v.recordTypeList}" var="item">
+                                <lightning:input aura:id="srd" type="radio" label="{!item.recordTypeLabel}" checked="{!if(v.selectedRecordType==item.recordTypeId,true,false)}"
+                                                 name="accountType" value="{!item.recordTypeId}" onchange="{!c.onChangeRecordType}"/>
+                            </aura:iteration>
+                        </div>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <lightning:button label="Cancel" variant="neutral"  onclick="{!c.defaultCloseAction}"/>
+                        <lightning:button label="Continue" variant="brand"  onclick="{!c.onconfirm}"/>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-backdrop slds-backdrop--open"></div>
+        </aura:if>
+        <!--Section for Account recordType Selection  ends-->
+        
+        <!--Section for Account record View starts-->
+        <aura:if isTrue="{!v.currentView =='RecordView'}">
+            <div role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header">
+                        <lightning:buttonIcon class="slds-modal__close" iconName="utility:close" size="large" 
+                                              variant="bare-inverse" alternativeText="Close" onclick="{!c.defaultCloseAction}" /> 
+                        
+                        <h2 id="header43" class="slds-text-heading--medium">Account Details</h2>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <div class="slds-align--absolute-center">
+                            <c:AccountView recordId="{!v.selectedRecord}" currView="{!v.currentView}" 
+                                           isRecordDeleted="{!v.isRefreshRequired}"/>
+                            
+                        </div>
+                    </div>
+                    <div class="slds-modal__footer">
+                    </div>
+                </div>
+            </div>
+            <div class="slds-backdrop slds-backdrop--open"></div>
+        </aura:if>
+        <!--Section for Account record View ends-->
+        
+        <!--Section for Account record edit starts-->
+        <aura:if isTrue="{!v.currentView =='RecordEdit'}">
+            <div role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header">
+                        <lightning:buttonIcon class="slds-modal__close" iconName="utility:close" size="large" 
+                                              variant="bare-inverse" alternativeText="Close" onclick="{!c.defaultCloseAction}" /> 
+                        
+                        <h2 id="header43" class="slds-text-heading--medium">Account Details</h2>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <div class="slds-align--absolute-center">
+                            <c:AccountEdit recordId="{!v.selectedRecord}" currView="{!v.currentView}" 
+                                           accountRecordType="{!v.selectedRecordType}" isRecordDeleted="{!v.isRefreshRequired}"/>
+                            
+                        </div>
+                    </div>
+                    <div class="slds-modal__footer">
+                    </div>
+                </div>
+            </div>
+            <div class="slds-backdrop slds-backdrop--open"></div>
+        </aura:if>
+        <!--Section for Account record edit ends-->
+        
+        <!--Section to display prompt before delete starts-->
+        <aura:if isTrue="{!v.currentView =='RecordDeleteConfirm'}">
+            <force:recordData aura:id="recordDeleteHandler"  recordId="{!v.recordIdToDelete}" fields="Id" 
+                              targetError="{!v.recordDeleteError}" />
+            <div role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__header">
+                        <h2 id="header43" class="slds-text-heading--medium">Confirmation</h2>
+                    </div>
+                    <div class="slds-modal__content slds-p-around--medium">
+                        <div class="slds-align--absolute-center">
+                            Are you sure want to delete account?
+                        </div>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <lightning:button label="Cancel" variant="neutral"  onclick="{!c.defaultCloseAction}"/>
+                        <lightning:button label="Confirm" variant="brand"  onclick="{!c.confirmDelete}"/> 
+                    </div>
+                </div>
+            </div>
+            <div class="slds-backdrop slds-backdrop--open"></div>
+        </aura:if>
+        <!--Section to display prompt before delete ends-->
+        
+</aura:component>
