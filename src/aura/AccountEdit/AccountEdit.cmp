@@ -1,0 +1,51 @@
+<aura:component >
+	<aura:attribute name="recordId" type="String" required="true"/>
+    <aura:attribute name="recordInfo" type="Object" access="private"/>
+    <aura:attribute name="record" type="Object" access="private"/>
+    <aura:attribute name="recordError" type="String" access="private"/>
+	<aura:attribute name="currView" type="String" />
+    <aura:attribute name="accountRecordType" type="String"/>
+    <aura:attribute name="isRecordDeleted" type="boolean" default="false" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <force:recordData aura:id="recordHandler"  
+                      recordId="{!v.recordId}"  
+                      layoutType="FULL" 
+                      targetFields="{!v.recordInfo}" 
+                      targetError="{!v.recordError}"   
+                      mode="EDIT"/>
+    
+    <force:recordData aura:id="newAccountCreator" 
+                      layoutType="FULL" 
+                      targetRecord="{!v.record}" 
+                      targetFields="{!v.recordInfo}"  
+                      targetError="{!v.recordError}"/>
+
+    <!-- Display Lightning Data Service errors, if any -->
+    <aura:if isTrue="{!not(empty(v.recordError))}">
+        <div class="recordError">
+            <ui:message title="Error" severity="error" closable="true">
+                {!v.recordError}
+            </ui:message>
+        </div>
+    </aura:if>
+
+    <!-- Display an editing form -->
+    <div class="slds-form--stacked">
+        <div class="slds-form-element">
+            <lightning:input type="text" label="Account Name" value="{!v.recordInfo.Name}" />
+        </div>
+        <div class="slds-form-element">
+            <lightning:input type="text" label="Type" value="{!v.recordInfo.Type}" />
+        </div>
+        <div class="slds-form-element">
+            <lightning:input type="text" label="Industry" value="{!v.recordInfo.Industry}" />
+        </div>
+        <div class="slds-form-element">
+            <lightning:input type="text" label="Phone" value="{!v.recordInfo.Phone}" />
+        </div>
+        <div class="slds-form-element">
+            <lightning:button variant="brand" label="Save Record"  onclick="{! c.updateRecord }"/>
+            <lightning:button variant="brand" label="Cancel"  onclick="{! c.goToView }"/>
+        </div>
+    </div>
+</aura:component>
