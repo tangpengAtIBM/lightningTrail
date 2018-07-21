@@ -1,0 +1,9 @@
+<aura:component >
+    <aura:attribute name="show" type="Boolean" default="false" />
+    <aura:handler name="change" value="{!v.show}" action="{!c.spinnerDisplayHandler}"/>
+	
+    <div class="slds-align--absolute-center">
+        <lightning:spinner aura:id="spinner" variant="brand" size="large" class="slds=hide"/>
+    </div>
+	
+</aura:component>
