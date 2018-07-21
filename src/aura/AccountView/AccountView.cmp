@@ -1,0 +1,56 @@
+<aura:component >
+	<aura:attribute name="recordId" type="String" required="true"/>
+    <aura:attribute name="recordInfo" type="Object"/>
+    <aura:attribute name="recordError" type="String"/>
+	<aura:attribute name="currView" type="String" />
+    <aura:attribute name="isRecordDeleted" type="boolean" default="false" />
+    <force:recordData aura:id="recordLoader"  recordId="{!v.recordId}"  layoutType="FULL"
+                          targetFields="{!v.recordInfo}" targetError="{!v.recordError}"/>
+
+    <div class="slds-form--stacked">
+		<div class="slds-form-element">
+            <label class="slds-form-element__label" for="recordName">Name </label>
+            <div class="slds-form-element__control">
+            	<ui:outputText value="{!v.recordInfo.Name}" aura:id="recordName"/>
+            </div>
+        </div>
+
+        <div class="slds-form-element">
+            <label class="slds-form-element__label" for="recordOwnerName">Owner </label>
+            <div class="slds-form-element__control">
+            	<ui:outputText value="{!v.recordInfo.Owner.Name}" aura:id="recordOwnerName"/>
+            </div>
+        </div>
+        
+        <div class="slds-form-element">
+            <label class="slds-form-element__label" for="accType">Type </label>
+            <div class="slds-form-element__control">
+            	<ui:outputText value="{!v.recordInfo.Type}" aura:id="accType"/>
+            </div>
+        </div>
+
+        <div class="slds-form-element">
+            <label class="slds-form-element__label" for="accIndustry">Industry </label>
+            <div class="slds-form-element__control">
+            	<ui:outputText value="{!v.recordInfo.Industry}" aura:id="accIndustry"/>
+            </div>
+        </div>
+        <div class="slds-form-element">
+            <lightning:button variant="brand" label="Edit Record"  onclick="{!c.editRecordHandler}"/>
+            <lightning:button variant="brand" label="Delete Record"  onclick="{!c.deleteRecordHandler}"/>
+            <lightning:button variant="brand" label="Back To List View"  onclick="{!c.goBack}"/> 
+        </div>
+
+    </div>
+    
+    
+    <!-- Display Lightning Data Service errors, if any -->
+    <aura:if isTrue="{!not(empty(v.recordError))}">
+        <div class="recordError">
+            <ui:message title="Error" severity="error" closable="true">
+                {!v.recordError}
+            </ui:message>
+        </div>
+    </aura:if>
+
+</aura:component>
