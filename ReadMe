@@ -7,3 +7,6 @@ menu checkbox
 3.delete button
 4.View button
 when you create the account you need to select the recourdtype firstly 
+
+when you refresh the page 
+showSpinnerCmp can be implement
